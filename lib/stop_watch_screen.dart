@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:fasting_tracker/background.dart';
 import 'package:flutter/material.dart';
 
 class StopWatchScreen extends StatefulWidget {
@@ -14,11 +15,8 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
   Timer? _timer;
 
   int _time = 57600;
-  int _currentTime = 100;
+  int _currentTime = 57000;
   double _progress = 0;
-  double remainTime() {
-    return _currentTime / _time;
-  }
 
   bool _isRunning = false;
 
@@ -50,12 +48,24 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         _currentTime++;
+        _progress = _currentTime / _time;
+        print(_progress);
+        if (_progress >= 1) {
+          _pause(); // 57600초가 지나면 타이머를 멈추도록 함
+        }
       });
     });
   }
 
   void _pause() {
     _timer?.cancel();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _progress = _currentTime / _time;
   }
 
   @override
@@ -79,6 +89,7 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
           ),
           CircularProgress(
             progress: _progress,
+            timeFormat: timeFormat(),
           ),
           const SizedBox(height: 40),
           Center(
@@ -104,14 +115,6 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
               ),
             ),
           ),
-          FloatingActionButton(onPressed: () {
-            setState(() {
-              _progress += 1;
-              if (_progress > 57600) {
-                _progress = 0;
-              }
-            });
-          }),
           const BackGround(),
         ],
       ),
@@ -119,132 +122,11 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
   }
 }
 
-class BackGround extends StatefulWidget {
-  const BackGround({super.key});
-
-  @override
-  State<BackGround> createState() => _BackGroundState();
-}
-
-class _BackGroundState extends State<BackGround>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<Alignment> _topAlignmentAnimation;
-  late Animation<Alignment> _bottomALignmentAnimaition;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 4),
-    );
-    _topAlignmentAnimation = TweenSequence<Alignment>([
-      TweenSequenceItem(
-          tween: Tween(begin: Alignment.topLeft, end: Alignment.topRight),
-          weight: 1),
-      TweenSequenceItem(
-          tween: Tween(begin: Alignment.topRight, end: Alignment.bottomRight),
-          weight: 1),
-      TweenSequenceItem(
-          tween: Tween(begin: Alignment.bottomRight, end: Alignment.bottomLeft),
-          weight: 1),
-      TweenSequenceItem(
-          tween: Tween(begin: Alignment.bottomLeft, end: Alignment.topLeft),
-          weight: 1),
-    ]).animate(_controller);
-
-    _bottomALignmentAnimaition = TweenSequence<Alignment>([
-      TweenSequenceItem(
-          tween: Tween(begin: Alignment.bottomRight, end: Alignment.bottomLeft),
-          weight: 1),
-      TweenSequenceItem(
-          tween: Tween(begin: Alignment.bottomLeft, end: Alignment.topLeft),
-          weight: 1),
-      TweenSequenceItem(
-          tween: Tween(begin: Alignment.topLeft, end: Alignment.topRight),
-          weight: 1),
-      TweenSequenceItem(
-          tween: Tween(begin: Alignment.topRight, end: Alignment.bottomRight),
-          weight: 1),
-    ]).animate(_controller);
-
-    _controller.repeat();
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    _controller.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, _) {
-            return Container(
-              width: 500,
-              height: 250,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [const Color(0xff8a55e1), const Color(0xfff4c6ca)],
-                  begin: _topAlignmentAnimation.value,
-                  end: _bottomALignmentAnimaition.value,
-                ),
-              ),
-              child: CustomPaint(
-                painter: _painter(animationValue: _controller.value),
-              ),
-            );
-          }),
-    );
-  }
-}
-
-class _painter extends CustomPainter {
-  final animationValue;
-
-  _painter({required this.animationValue});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    double heightParameter = 30;
-    double periodParameter = 0.5;
-
-    Paint paint = Paint()
-      ..color = const Color(0xfffffbff)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-
-    Path path = Path();
-    // TODO: do operations here
-
-    for (double i = 0; i < 500; i++) {
-      path.lineTo(
-          i,
-          125 +
-              heightParameter *
-                  sin(animationValue * pi * 2 +
-                      periodParameter * i * (pi / 180)));
-      path.moveTo(i, 0);
-    }
-    path.close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => true;
-}
-
 class CircularProgress extends StatefulWidget {
+  const CircularProgress(
+      {super.key, required this.progress, required this.timeFormat});
   final double progress;
-  const CircularProgress({super.key, required this.progress});
-
+  final String timeFormat;
   @override
   State<CircularProgress> createState() => _CircularProgressState();
 }
@@ -253,11 +135,12 @@ class _CircularProgressState extends State<CircularProgress>
     with TickerProviderStateMixin {
   late AnimationController _animationController;
   Animation<double>? _progressTweenAnimation;
-  final double _circularProgressSize = 0.3;
+  final double _circularProgressSize = 0.8;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
     _animationController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 450));
 
@@ -289,13 +172,18 @@ class _CircularProgressState extends State<CircularProgress>
     return CustomPaint(
       painter: CircularProgressPainter(
           circularProgressSize: size.width * _circularProgressSize,
-          progress: _progressTweenAnimation?.value ?? 0),
+          progress: widget.progress),
       child: Container(
         width: size.width * _circularProgressSize,
         height: size.width * _circularProgressSize,
         child: Center(
           child: Text(
-              "${(_progressTweenAnimation?.value ?? 0).toStringAsFixed(0)}%"),
+            widget.timeFormat,
+            style: TextStyle(
+                color: Colors.black87,
+                fontSize: 50,
+                fontWeight: FontWeight.w600),
+          ),
         ),
       ),
     );
@@ -318,13 +206,13 @@ class CircularProgressPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paintBackground = Paint()
-      ..strokeWidth = 16
-      ..color = Colors.grey
+      ..strokeWidth = 20
+      ..color = Colors.purple.shade50
       ..style = PaintingStyle.stroke;
 
     final paintProgress = Paint()
-      ..strokeWidth = 12
-      ..color = Colors.green
+      ..strokeWidth = 10
+      ..color = Colors.deepPurple.shade200
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
 
