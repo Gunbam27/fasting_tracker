@@ -1,4 +1,4 @@
-package com.example.fasting_tracker
+package com.fasting_tracker.myapp
 
 import io.flutter.embedding.android.FlutterActivity
 
