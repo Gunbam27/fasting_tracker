@@ -15,7 +15,7 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
   Timer? _timer;
 
   int _time = 57600;
-  int _currentTime = 57000;
+  int _currentTime = 0;
   double _progress = 0;
 
   bool _isRunning = false;
@@ -177,12 +177,24 @@ class _CircularProgressState extends State<CircularProgress>
         width: size.width * _circularProgressSize,
         height: size.width * _circularProgressSize,
         child: Center(
-          child: Text(
-            widget.timeFormat,
-            style: TextStyle(
-                color: Colors.black87,
-                fontSize: 50,
-                fontWeight: FontWeight.w600),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {},
+                child: Text(
+                  '16-8',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                ),
+              ),
+              Text(
+                widget.timeFormat,
+                style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 50,
+                    fontWeight: FontWeight.w600),
+              ),
+            ],
           ),
         ),
       ),
