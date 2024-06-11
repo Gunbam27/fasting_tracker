@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:fasting_tracker/background.dart';
+import 'package:fasting_tracker/presentation/component/background.dart';
+import 'package:fasting_tracker/presentation/component/chose_time_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 
 class StopWatchScreen extends StatefulWidget {
@@ -181,7 +182,15 @@ class _CircularProgressState extends State<CircularProgress>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  showModalBottomSheet(
+                    isScrollControlled: true,
+                    context: context,
+                    builder: (context) {
+                      return ChoseTimeBottomSheet();
+                    },
+                  );
+                },
                 child: Text(
                   '16-8',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),

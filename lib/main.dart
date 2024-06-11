@@ -1,4 +1,4 @@
-import 'package:fasting_tracker/stop_watch_screen.dart';
+import 'package:fasting_tracker/presentation/stop_watch_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
