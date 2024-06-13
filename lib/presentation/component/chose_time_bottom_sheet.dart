@@ -1,7 +1,10 @@
+import 'package:fasting_tracker/enum/fasting_timer.dart';
+import 'package:fasting_tracker/presentation/component/time_option.dart';
 import 'package:flutter/material.dart';
 
 class ChoseTimeBottomSheet extends StatelessWidget {
-  const ChoseTimeBottomSheet({super.key});
+  final Function(FastingTimer selectedTime) onSelect;
+  const ChoseTimeBottomSheet({super.key, required this.onSelect});
 
   @override
   Widget build(BuildContext context) {
@@ -22,52 +25,23 @@ class ChoseTimeBottomSheet extends StatelessWidget {
                   color: Colors.grey,
                 ),
               ),
-              Expanded(child: Text(textAlign: TextAlign.center, '계획 변경하기')),
+              Expanded(
+                child: Text(
+                  textAlign: TextAlign.center,
+                  '계획 변경하기',
+                  style: TextStyle(fontSize: 22),
+                ),
+              ),
               SizedBox(
                 width: 40,
               ),
             ],
           ),
           SizedBox(
-            height: 10,
+            height: 20,
           ),
-          InkWell(
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: Colors.blue.shade100,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '14-10',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Text(
-                    '14시간 단식',
-                    style: TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                  Text(
-                    '10시간 식사 기간',
-                    style: TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Text('16-8'),
-          Text('18-6'),
-          Text('20-4'),
+          ...FastingTimer.values
+              .map((e) => TimeOption(onSelect: onSelect, fastingTimer: e)),
         ],
       ),
     );

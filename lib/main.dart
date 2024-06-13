@@ -1,3 +1,4 @@
+import 'package:fasting_tracker/enum/fasting_timer.dart';
 import 'package:fasting_tracker/presentation/stop_watch_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +18,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: StopWatchScreen(),
+      home: StopWatchScreen(
+        fastingTimer: FastingTimer.fourteenTen,
+      ),
     );
   }
 }
